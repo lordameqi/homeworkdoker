@@ -1,0 +1,33 @@
+version: '3'
+services:
+    database:
+        image: mongo
+        ports:
+            - "27017:27017"
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: password
+            MONGO_INITDB_DATABASE: test
+        restart: always
+        volumes:
+            - ./mongo:/data/db
+    backend:
+        image: ameki1996/tugas-backend:1.0
+        ports:
+            - "8080:8080"
+        depends_on: 
+            - database
+        environment:
+            DB_URI: mongodb://root:password@database:27017
+            DB_NAME: test
+            DB_COLLECTION_NAME: todolist
+        restart: always
+    frontend:
+        image: ameki1996/tugas-frontend:1.0
+        ports:
+            - "3000:8080"
+        depends_on: 
+            - backend
+        environment:
+            REACT_APP_GO_ENDPOINT: backend:8080
+        restart: always
